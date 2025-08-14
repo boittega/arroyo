@@ -47,10 +47,11 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Check Formatting
         run: cargo fmt -- --check
-      - uses: actions/setup-python@v5
-        name: Setup Python
-        with:
-          python-version: '3.12'            
+      - name: Setup Python
+        run: |
+          eval "$(pyenv init -)"
+          pyenv install 3.12 -s
+          pyenv global 3.12            
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
