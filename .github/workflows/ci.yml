@@ -98,9 +98,25 @@ jobs:
       - name: Install Kafka
         run: |
           brew install kafka
+          # Create Kafka directories
           mkdir -p /tmp/kraft-combined-logs
-          kafka-storage format -t 9v5PspiySuWU2l5NjTgRuA -c $(brew --prefix)/etc/kafka/kraft/server.properties
-          brew services start kafka
+          mkdir -p /tmp/kafka/config
+          # Create Kafka config
+          cat > /tmp/kafka/config/kraft.properties << EOL
+          node.id=1
+          controller.quorum.voters=1@localhost:9093
+          process.roles=broker,controller
+          inter.broker.listener.name=PLAINTEXT
+          controller.listener.names=CONTROLLER
+          listeners=PLAINTEXT://:9092,CONTROLLER://:9093
+          listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+          advertised.listeners=PLAINTEXT://localhost:9092
+          log.dirs=/tmp/kraft-combined-logs
+          EOL
+          # Format storage directory
+          kafka-storage format -t 9v5PspiySuWU2l5NjTgRuA -c /tmp/kafka/config/kraft.properties
+          # Start Kafka
+          kafka-server-start -daemon /tmp/kafka/config/kraft.properties
       - name: Install mosquitto
         run: |
           brew install mosquitto
