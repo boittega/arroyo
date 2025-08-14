@@ -21,7 +21,7 @@ jobs:
         config:
           - { runner: ubuntu-22.04-32, protoc: linux-x86_64, pyarch: x86_64, artifact: linux-x86_64 }
           - { runner: ubuntu-22.04-32-arm, protoc: linux-aarch_64, pyarch: aarch64, artifact: linux-arm64 }
-    runs-on: ${{ matrix.config.runner }}
+    runs-on: self-hosted
     services:
       postgres:
         image: postgres:14.13-alpine3.20
@@ -85,7 +85,7 @@ jobs:
         config:
           - { runner: macos-14-large, protoc: osx-x86_64, artifact: macos-x86_64 }
           - { runner: macos-14-xlarge, protoc: osx-aarch_64, artifact: macos-m1 }
-    runs-on: ${{ matrix.config.runner }}
+    runs-on: self-hosted
     steps:
       - name: Check out
         uses: actions/checkout@v4

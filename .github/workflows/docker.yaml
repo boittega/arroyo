@@ -26,7 +26,7 @@ jobs:
           - platform: linux/arm64
             runs_on: ubuntu-22.04-32-arm
             arch: arm64
-    runs-on: ${{ matrix.runs_on }}
+    runs-on: self-hosted
     steps:
       - name: Prepare
         run: |
@@ -137,7 +137,7 @@ jobs:
           - arroyo
           - arroyo-single
           - arroyo-full
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       -
         name: Download digests
