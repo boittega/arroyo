@@ -68,9 +68,26 @@ jobs:
         run: |
           brew install postgresql@14
           brew services start postgresql@14
-          sleep 5
-          psql postgres -c "CREATE USER arroyo WITH PASSWORD 'arroyo' SUPERUSER;"
+          # Wait for PostgreSQL to be ready
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432; then
+              break
+            fi
+            echo "Waiting for PostgreSQL to be ready... ($i/30)"
+            sleep 1
+          done
+          # Create user if not exists
+          psql postgres -c "DO \$\$
+          BEGIN
+              IF NOT EXISTS (SELECT FROM pg_user WHERE usename = 'arroyo') THEN
+                  CREATE USER arroyo WITH PASSWORD 'arroyo' SUPERUSER;
+              END IF;
+          END
+          \$\$;"
+          # Reset database
+          dropdb arroyo --if-exists
           createdb arroyo
+          # Install and run migrations
           cargo install --debug refinery_cli --version 0.8.7
           refinery migrate -e DATABASE_URL -p crates/arroyo-api/migrations
       - name: Install dependencies
